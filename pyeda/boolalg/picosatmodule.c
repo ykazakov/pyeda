@@ -36,19 +36,32 @@ static PyObject *Error;
 inline static void *
 _pymalloc(void *pmgr, size_t nbytes)
 {
-    return PyMem_Malloc(nbytes);
+    void *ptr;
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    ptr = PyMem_Malloc(nbytes);
+    PyGILState_Release(gstate);
+    return ptr;
 }
 
 inline static void *
 _pyrealloc(void *pmgr, void *p, size_t old, size_t new)
 {
-    return PyMem_Realloc(p, new);
+    void *ptr;
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    ptr = PyMem_Realloc(p, new);
+    PyGILState_Release(gstate);
+    return ptr;
 }
 
 inline static void
 _pyfree(void *pmgr, void *p, size_t nbytes)
 {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
     PyMem_Free(p);
+    PyGILState_Release(gstate);
 }
 
 
